@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="./router.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Algoritmos de enrutamiento</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <script type="module" crossorigin src="/Enrutamiento/assets/index-BJXtq2cJ.js"></script>
+    <link rel="stylesheet" crossorigin href="/Enrutamiento/assets/index-DeaikZen.css">
+  </head>
+  <body>
+    <div class="tag">
+      <a href="https://mario7w78.github.io/" target="_blank"
+        >Algoritmos de Enrutamiento</a
+      >
+    </div>
+
+    <button class="select-dropdown">
+      ▲ Probar Algoritmos de Enrutamiento ▲
+    </button>
+
+    <div class="choose">
+      <div class="OD-1">
+        <strong>Red Dorsal Nacional de Fibra Óptica</strong>
+        <hr />
+        Seleccionar Algoritmo
+        <hr />
+        <select class="Algoritmo" id="alg" name="Algoritmo">
+          <option value="" disabled selected>Algoritmo</option>
+          <option value="dijkstra">Dijkstra (OSPF)</option>
+          <option value="bellman-ford">Bellman Ford (RIP)</option>
+        </select>
+        <hr />
+        Seleccionar Origen y Destino
+        <hr />
+
+        <div class="OD-2">
+          <select class="OD" id="origen" name="origen"></select>
+          <select class="OD" id="destino" name="destino"></select>
+        </div>
+      </div>
+    </div>
+
+    <div id="root"></div>
+
+
+  </body>
+</html>
