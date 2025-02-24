@@ -27,7 +27,7 @@
 
 .choose{
     display: flex;
-
+    
     justify-content: center;
     opacity: 0;
     pointer-events: none;
@@ -44,6 +44,7 @@
     font-family: monospace;
     font-size: 14px;
     padding-top: 10px;
+    padding-bottom: 10px;
     text-align: center;
 
     min-height: 20vw;
@@ -77,6 +78,8 @@ hr{
     
 }
 
+
+
 .Algoritmo:hover, .OD:hover{
     background-color: black;
     color: white;
@@ -103,3 +106,10 @@ hr{
     justify-content: center;
 }
 
+
+#prcs{
+    background-color: white;
+    font-family: monospace;
+    border-radius: 50px;
+    cursor: pointer;
+}

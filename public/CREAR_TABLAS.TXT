@@ -1,0 +1,147 @@
+-- Tablas Principales
+CREATE TABLE CLIENTE (
+    id NUMBER PRIMARY KEY,
+    es_persona_natural NUMBER(1) NOT NULL CHECK (es_persona_natural IN (0, 1)),
+    tipo_cliente_id NUMBER,
+    numero_cuenta NUMBER UNIQUE  -- Nuevo atributo (entero único)
+);
+
+CREATE TABLE TIPO_CLIENTE (
+    id NUMBER PRIMARY KEY,
+    nombre VARCHAR2(50),
+    porcentaje_descuento NUMBER(5,2)
+);
+
+-- Especialización de Clientes
+CREATE TABLE PERSONA_NATURAL (
+    cliente_id NUMBER PRIMARY KEY,
+    correo VARCHAR2(100),
+    fecha_nacimiento DATE,
+    apellido_materno VARCHAR2(50),
+    apellido_paterno VARCHAR2(50),
+    primer_nombre VARCHAR2(50),
+    id_c1 VARCHAR2(20),
+    FOREIGN KEY (cliente_id) REFERENCES CLIENTE(id)
+);
+
+CREATE TABLE PERSONA_JURIDICA (
+    cliente_id NUMBER PRIMARY KEY,
+    razon_social VARCHAR2(100),
+    id_c2 VARCHAR2(20),
+    FOREIGN KEY (cliente_id) REFERENCES CLIENTE(id)
+);
+
+-- Tablas de Facturación
+CREATE TABLE FACTURA (
+    id NUMBER PRIMARY KEY,
+    fecha TIMESTAMP,
+    cliente_id NUMBER,
+    caja_id NUMBER,
+    total NUMBER(10,2),
+    estado VARCHAR2(20),
+    FOREIGN KEY (cliente_id) REFERENCES CLIENTE(id),
+    FOREIGN KEY (caja_id) REFERENCES CAJA(id)
+);
+
+CREATE TABLE DETALLE_FACTURA (
+    id NUMBER PRIMARY KEY,
+    factura_id NUMBER,
+    item_id NUMBER,
+    cantidad NUMBER,
+    precio_unitario NUMBER(10,2),
+    descuento_item NUMBER(5,2),
+    descuento_cliente NUMBER(5,2),
+    subtotal NUMBER(10,2),
+    FOREIGN KEY (factura_id) REFERENCES FACTURA(id),
+    FOREIGN KEY (item_id) REFERENCES ITEM(id)
+);
+
+-- Tablas de Productos
+CREATE TABLE ITEM (
+    id NUMBER PRIMARY KEY,
+    nombre VARCHAR2(100),
+    descripcion CLOB,
+    precio_base NUMBER(10,2),
+    color_id NUMBER,
+    FOREIGN KEY (color_id) REFERENCES COLOR(id)
+);
+
+CREATE TABLE COLOR (
+    id NUMBER PRIMARY KEY,
+    nombre VARCHAR2(50),
+    codigo_hex VARCHAR2(7)
+);
+
+-- Tablas de Descuentos
+CREATE TABLE DESCUENTO_ITEM (
+    id NUMBER PRIMARY KEY,
+    item_id NUMBER,
+    tipo_descuento_id NUMBER,
+    contexto_id NUMBER,
+    porcentaje NUMBER(5,2),
+    FOREIGN KEY (item_id) REFERENCES ITEM(id),
+    FOREIGN KEY (tipo_descuento_id) REFERENCES TIPO_DESCUENTO(id),
+    FOREIGN KEY (contexto_id) REFERENCES CONTEXTO(id)
+);
+
+CREATE TABLE CONTEXTO (
+    id NUMBER PRIMARY KEY,
+    nombre VARCHAR2(50),
+    fecha_inicio DATE,
+    fecha_fin DATE
+);
+
+CREATE TABLE TIPO_DESCUENTO (
+    id NUMBER PRIMARY KEY,
+    nombre VARCHAR2(50),
+    descripcion CLOB
+);
+
+-- Tablas de Operaciones
+CREATE TABLE CAJA (
+    id NUMBER PRIMARY KEY,
+    nombre VARCHAR2(50),
+    empleado_id NUMBER,
+    FOREIGN KEY (empleado_id) REFERENCES EMPLEADO(id)
+);
+
+CREATE TABLE EMPLEADO (
+    id NUMBER PRIMARY KEY,
+    nombre VARCHAR2(100),
+    cargo VARCHAR2(50),
+    fecha_contratacion DATE
+);
+
+-- Tablas de Inventario
+CREATE TABLE ALMACEN (
+    id NUMBER PRIMARY KEY,
+    nombre VARCHAR2(100),
+    direccion VARCHAR2(200)
+);
+
+CREATE TABLE ITEM_ALMACEN (
+    id NUMBER PRIMARY KEY,
+    item_id NUMBER,
+    almacen_id NUMBER,
+    cantidad NUMBER,
+    FOREIGN KEY (item_id) REFERENCES ITEM(id),
+    FOREIGN KEY (almacen_id) REFERENCES ALMACEN(id)
+);
+
+-- Tablas Multivaluadas
+CREATE TABLE TELEFONO_CLIENTE (
+    id NUMBER PRIMARY KEY,
+    cliente_id NUMBER,
+    telefono VARCHAR2(20),
+    FOREIGN KEY (cliente_id) REFERENCES CLIENTE(id)
+);
+
+CREATE TABLE DIRECCION_CLIENTE (
+    id NUMBER PRIMARY KEY,
+    cliente_id NUMBER,
+    direccion VARCHAR2(200),
+    ciudad VARCHAR2(50),
+    codigo_postal VARCHAR2(10),
+    tipo VARCHAR2(20),
+    FOREIGN KEY (cliente_id) REFERENCES CLIENTE(id)
+);

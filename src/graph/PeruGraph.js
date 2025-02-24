@@ -9,7 +9,7 @@ class PeruGraph extends Graph {
       this.initializeGraph(nodos, conexiones);
     }
   
-    // Inicializa el grafo con nodos y conexiones
+    
     initializeGraph(nodos, conexiones) {
       nodos.forEach((nodo) => this.addNode(nodo));
   

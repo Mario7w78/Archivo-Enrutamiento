@@ -26,14 +26,19 @@ document.addEventListener('click', () => {
 
 let options = "";
 
+// Nodos de Amazonas
+for (let i = 1; i <= 5; i++) {
+    options += `<option class="op" value="Nodo Amazonas ${i}">Nodo Amazonas ${i}</option>`;
+}
+
 // Nodos de Áncash
 for (let i = 1; i <= 3; i++) {
     options += `<option class="op" value="Nodo Áncash ${i}">Nodo Áncash ${i}</option>`;
 }
 
-// Nodos de Amazonas
+// Nodos de Apurímac
 for (let i = 1; i <= 5; i++) {
-    options += `<option class="op" value="Nodo Amazonas ${i}">Nodo Amazonas ${i}</option>`;
+    options += `<option class="op" value="Nodo Apurímac ${i}">Nodo Apurímac ${i}</option>`;
 }
 
 // Nodos de Arequipa
@@ -101,6 +106,11 @@ for (let i = 1; i <= 3; i++) {
     options += `<option class="op" value="Nodo Madre de Dios ${i}">Nodo Madre de Dios ${i}</option>`;
 }
 
+// Nodos de Pasco 
+for (let i = 1; i <= 3; i++) {
+    options += `<option class="op" value="Nodo Pasco ${i}">Nodo Pasco ${i}</option>`;
+}
+
 // Nodos de Piura
 for (let i = 1; i <= 3; i++) {
     options += `<option class="op" value="Nodo Piura ${i}">Nodo Piura ${i}</option>`;
@@ -121,15 +131,17 @@ for (let i = 1; i <= 2; i++) {
     options += `<option class="op" value="Nodo Tacna ${i}">Nodo Tacna ${i}</option>`;
 }
 
+// Nodos de Tumbes
+for (let i = 1; i <= 1; i++) {
+    options += `<option class="op" value="Nodo Tumbes ${i}">Nodo Tumbes ${i}</option>`;
+}
+
 // Nodos de Ucayali
 for (let i = 1; i <= 5; i++) {
     options += `<option class="op" value="Nodo Ucayali ${i}">Nodo Ucayali ${i}</option>`;
 }
 
-// Nodos de Tumbes
-for (let i = 1; i <= 1; i++) {
-    options += `<option class="op" value="Nodo Tumbes ${i}">Nodo Tumbes ${i}</option>`;
-}
+
 
 
 origen.innerHTML = '<option value="" disabled selected>Origen</option>'+ options;

@@ -1,5 +1,8 @@
 import { Tools } from "./Tools";
-import TinyQueue from 'tinyqueue';
+import FastPriorityQueue from "fastpriorityqueue";
+
+
+
 /**
  * Graph: Grafo
  * Nodes: Nodos - Vertice
@@ -32,75 +35,83 @@ class Graph {
         distances.set(node, Infinity);
         predecessors.set(node, null);
       });
+
       distances.set(startNode, 0);
       return { distances, predecessors };
     }
   
-    shortestPath(start, end, algorithm = "dijkstra", iterations = 10) {
+    shortestPath(start, end, algorithm = "dijkstra", iterations = 3) {
       try {
-        let totalExecutionTime = 0;
-        let result;
+          let totalExecutionTime = 0;
+          let result;
   
-        for (let i = 0; i < iterations; i++) {
-          const { distances, predecessors, executionTime } =
-            algorithm === "dijkstra"
-              ? this.dijkstra(start, end)
-              : this.bellmanFord(start, end);
-          
-          totalExecutionTime += executionTime;
-          if (i === 0) result = { distances, predecessors };
-        }
+          for (let i = 0; i < iterations; i++) {
+              const startTime = performance.now(); 
   
-        const avgExecutionTime = totalExecutionTime / iterations;
-        const path = Tools.reconstructPath(result.predecessors, end);
+              const res = algorithm === "dijkstra"
+                  ? this.dijkstra(start, end)
+                  : this.bellmanFord(start, end);
   
-        return path.length > 1
-          ? { path, distance: result.distances.get(end), executionTime: avgExecutionTime, algorithm }
-          : { path: [], distance: Infinity };
+              const endTime = performance.now(); 
+              totalExecutionTime += (endTime - startTime); 
+  
+              if (i === 0) result = res; 
+          }
+  
+          const avgExecutionTime = totalExecutionTime / iterations; 
+  
+          const path = Tools.reconstructPath(result.predecessors, end);
+  
+          return path.length > 1
+              ? { path, distance: result.distances.get(end), executionTime: avgExecutionTime, algorithm }
+              : { path: [], distance: Infinity };
   
       } catch (error) {
-        console.error(`Error en ${algorithm}:`, error.message);
-        return { path: [], distance: Infinity };
+          console.error(`Error en ${algorithm}:`, error.message);
+          return { path: [], distance: Infinity };
       }
-    }
-  
-    dijkstra(startNode, endNode) {
-      const startTime = performance.now();
-
-      const { distances, predecessors } = this.initializeAlgorithm(startNode);
-      const visited = new Array(this.nodes.size).fill(false);
-      const priorityQueue = new TinyQueue([], (a, b) => distances.get(a) - distances.get(b));
-
-      priorityQueue.push(startNode);
-
-      while (priorityQueue.length > 0) {
-          const currentNode = priorityQueue.pop();
-
-          if (currentNode === endNode) break;
-          if (visited[currentNode]) continue;
-
-          visited[currentNode] = true;
-
-          // Relajación
-          this.edges.get(currentNode).forEach(({ node, weight }) => {
-              if (!visited[node]) {
-                  const newDistance = distances.get(currentNode) + weight;
-                  if (newDistance < distances.get(node)) {
-                      distances.set(node, newDistance);
-                      predecessors.set(node, currentNode);
-                      priorityQueue.push(node);
-                  }
-              }
-          });
-      }
-
-      const endTime = performance.now();
-      return { distances, predecessors, executionTime: (endTime - startTime) };
   }
+  
+  
+    
+
+dijkstra(startNode, endNode) {
+
+    const { distances, predecessors } = this.initializeAlgorithm(startNode);
+
+    const visited = new Set();
+    const priorityQueue = new FastPriorityQueue((a, b) => a.priority < b.priority);
+    
+    priorityQueue.add({ node: startNode, priority: 0 });
+
+    while (!priorityQueue.isEmpty()) {
+        const { node: currentNode } = priorityQueue.poll();
+
+        if (visited.has(currentNode)) continue;
+        visited.add(currentNode);
+
+        if (currentNode === endNode) break;
+
+        this.edges.get(currentNode).forEach(({ node, weight }) => {
+            if (!visited.has(node)) {
+                const newDistance = distances.get(currentNode) + weight;
+                if (newDistance < distances.get(node)) {
+                    distances.set(node, newDistance);
+                    predecessors.set(node, currentNode);
+                    priorityQueue.add({ node, priority: newDistance });
+                }
+            }
+        });
+    }
+
+    
+    return { distances, predecessors};
+}
+
 
   
     bellmanFord(startNode, endNode) {
-      const startTime = performance.now();
+      
       
       const { distances, predecessors } = this.initializeAlgorithm(startNode);
       const edgeList = this.getEdgeList();
@@ -124,9 +135,9 @@ class Graph {
           throw new Error("El grafo contiene un ciclo negativo");
         }
       }
-  
-      const endTime = performance.now();
-      return { distances, predecessors, executionTime: (endTime - startTime) };
+
+      
+      return { distances, predecessors};
     }
   
     getEdgeList() {

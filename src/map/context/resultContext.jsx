@@ -9,8 +9,12 @@ export const ResultadosProvider = ({ children }) => {
     setResultados((prev) => [...prev, nuevoResultado]);
   };
 
+  const limpiarResultados = () => {
+    setResultados([]); // Reinicia el estado a un array vacío
+  };
+
   return (
-    <ResultadosContext.Provider value={{ resultados, agregarResultados }}>
+    <ResultadosContext.Provider value={{ resultados, agregarResultados, limpiarResultados }}>
       {children}
     </ResultadosContext.Provider>
   );

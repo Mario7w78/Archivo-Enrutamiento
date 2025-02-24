@@ -1,18 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-kml";
 import peruGraph from "../graph/PeruGraph"; 
 import { coordenadas } from "../graph/data.js";
-import { useContext } from "react";
 import { ResultadosContext } from "./context/resultContext";
-
 
 const Mapa = ({ startNode, endNode, algoritmo }) => {
   const [map, setMap] = useState(null);
   const [routeLayer, setRouteLayer] = useState(null);
   const { agregarResultados } = useContext(ResultadosContext);
-
 
   useEffect(() => {
     const newMap = L.map("map").setView([-13.5319, -71.9675], 6); // Centered on Peru
@@ -31,24 +28,25 @@ const Mapa = ({ startNode, endNode, algoritmo }) => {
         newMap.addLayer(track);
         newMap.fitBounds(track.getBounds());
 
-        // Customize placemarks and lines
+        
         track.getLayers().forEach(layer => {
           if (layer instanceof L.Marker) {
             // Change icons of markers
             let customIcon = L.icon({
-              iconUrl: './router.png', // Change this to your icon path
-              iconSize: [24, 24],   // Icon size
-              iconAnchor: [10, 16], // Icon anchor point
+              iconUrl: './router.png',
+              iconSize: [24, 24],   
+              iconAnchor: [10, 16], 
               popupAnchor: [0, -12]
             });
             layer.setIcon(customIcon);
           } else if (layer instanceof L.Polyline) {
-            // Change the style of the lines (create a dotted line)
+            
+
             layer.setStyle({
-              color: '#000000', // Line color
-              weight: 2.5,        // Line thickness
+              color: '#06007a', // Line color
+              weight: 3,        // Line thickness
               opacity: 0.8,     // Line opacity
-              dashArray: '1, 5' // Dotted pattern
+              dashArray: '1,5' // Dotted pattern
             });
           }
         });
@@ -61,28 +59,41 @@ const Mapa = ({ startNode, endNode, algoritmo }) => {
     };
   }, []);
 
-  useEffect(() => {
-    if (!map || !startNode || !endNode || !algoritmo) return;
-
-    // Get the shortest path
-    const { path, distance, executionTime, algorithm } = peruGraph.shortestPath(startNode, endNode, algoritmo);
-
-    if (path.length === 0) {
-      console.log("No valid route found");
+  
+  const handleProcesar = () => {
+    if (!map || !startNode || !endNode || !algoritmo) {
+      alert("Por favor, selecciona un nodo de inicio y un nodo de fin.");
       return;
     }
 
-    agregarResultados({algorithm, distance, executionTime});
+    
+    const dijkstraResult = peruGraph.shortestPath(startNode, endNode, "dijkstra");
+    const bellmanFordResult = peruGraph.shortestPath(startNode, endNode, "bellman-ford");
 
-    // Remove the previous route
+    console.log(dijkstraResult);
+    console.log(bellmanFordResult);
+
+    // Guardar los resultados de ambos algoritmos en el contexto
+    agregarResultados({
+      algorithm: "dijkstra",
+      distance: dijkstraResult.distance,
+      executionTime: dijkstraResult.executionTime,
+    });
+    agregarResultados({
+      algorithm: "bellman-ford",
+      distance: bellmanFordResult.distance,
+      executionTime: bellmanFordResult.executionTime,
+    });
+
+    // Eliminar la ruta anterior
     if (routeLayer) {
       map.removeLayer(routeLayer);
     }
 
-    // Convert path to coordinates
-    const coordinates = path.map((node) => [coordenadas[node][1], coordenadas[node][0]]);
+    // Dibujar la ruta del algoritmo seleccionado
+    const selectedResult = algoritmo === "dijkstra" ? dijkstraResult : bellmanFordResult;
+    const coordinates = selectedResult.path.map((node) => [coordenadas[node][1], coordenadas[node][0]]);
 
-    // Draw the new route with conditional color
     const color = algoritmo === "dijkstra" ? "red" : "blue";
     const newRoute = L.polyline(coordinates, {
       color: color,
@@ -93,9 +104,28 @@ const Mapa = ({ startNode, endNode, algoritmo }) => {
     map.fitBounds(newRoute.getBounds());
 
     setRouteLayer(newRoute);
-  }, [map, startNode, endNode, algoritmo]);
+  };
 
-  return <div id="map" className="mapa"></div>;
+  
+  useEffect(() => {
+    const botonProcesar = document.getElementById("prcs");
+    if (botonProcesar) {
+      botonProcesar.addEventListener("click", handleProcesar);
+    }
+
+    
+    return () => {
+      if (botonProcesar) {
+        botonProcesar.removeEventListener("click", handleProcesar);
+      }
+    };
+  }, [handleProcesar]); 
+
+  return (
+    <div>
+      <div id="map" className="mapa"></div>
+    </div>
+  );
 };
 
 export default Mapa;
